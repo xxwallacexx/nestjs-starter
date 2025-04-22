@@ -1,0 +1,18 @@
+import { Controller, Get, Header } from '@nestjs/common';
+import { ApiExcludeEndpoint } from '@nestjs/swagger';
+import { SystemConfigService } from 'src/services/system-config.service';
+
+@Controller()
+export class AppController {
+  constructor(private service: SystemConfigService) {}
+
+  @ApiExcludeEndpoint()
+  @Get('.well-known')
+  getWellKnown() {
+    return {
+      api: {
+        endpoint: '/api',
+      },
+    };
+  }
+}
