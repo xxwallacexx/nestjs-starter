@@ -18,7 +18,7 @@ export interface UserFindOptions {
 
 @Injectable()
 export class UserRepository {
-  constructor(@InjectKysely() private db: Kysely<DB>) {}
+  constructor(@InjectKysely() private db: Kysely<DB>) { }
 
   @GenerateSql({ params: [DummyValue.UUID, DummyValue.BOOLEAN] })
   get(userId: string, options: UserFindOptions): Promise<UserEntity | undefined> {
