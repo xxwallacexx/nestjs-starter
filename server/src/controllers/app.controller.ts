@@ -7,7 +7,7 @@ export class AppController {
   constructor(private service: SystemConfigService) {}
 
   @ApiExcludeEndpoint()
-  @Get('.well-known')
+  @Get('.well-known/fat')
   getWellKnown() {
     return {
       api: {

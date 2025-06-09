@@ -55,13 +55,6 @@ function bootstrap() {
     return CommandFactory.run(AppAdminModule);
   }
 
-  if (app === 'fat' || app === 'microservices') {
-    console.error(
-      `Using "start.sh ${app}" has been deprecated. See https://github.com/immich-app/mmich/releases/tag/v1.118.0 for more information.`,
-    );
-    process.exit(1);
-  }
-
   if (app) {
     console.error(`Unknown command: "${app}"`);
     process.exit(1);
