@@ -56,8 +56,8 @@ const generate = async (name: string) => {
 const create = (name: string, up: string[], down: string[]) => {
   const timestamp = Date.now();
   const filename = `${timestamp}-${name}.ts`;
-  const fullPath = `./src/${filename}`;
-  writeFileSync(fullPath, asMigration('kysely', { name, timestamp, up, down }));
+  const fullPath = `./src/migrations/${filename}`;
+  writeFileSync(fullPath, asMigration('typeorm', { name, timestamp, up, down }));
   console.log(`Wrote ${fullPath}`);
 };
 
