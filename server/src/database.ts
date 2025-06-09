@@ -38,6 +38,7 @@ export type UserAdmin = User & {
 
 export type AuthSession = {
   id: string;
+  hasElevatedPermission: boolean;
 };
 
 const userColumns = ['id', 'name', 'email'] as const;
@@ -45,9 +46,19 @@ const userColumns = ['id', 'name', 'email'] as const;
 export const columns = {
   authUser: ['users.id', 'users.name', 'users.email', 'users.isAdmin'],
   authApiKey: ['api_keys.id', 'api_keys.permissions'],
-  authSession: ['sessions.id', 'sessions.updatedAt'],
+  authSession: ['sessions.id', 'sessions.updatedAt', 'sessions.pinExpiresAt'],
   user: userColumns,
   userAdmin: [...userColumns, 'createdAt', 'updatedAt', 'deletedAt', 'isAdmin', 'status', 'shouldChangePassword'],
   tagDto: ['id', 'value', 'createdAt', 'updatedAt', 'color', 'parentId'],
   apiKey: ['id', 'name', 'userId', 'createdAt', 'updatedAt', 'permissions'],
 } as const;
+
+export type Session = {
+  id: string;
+  createdAt: Date;
+  updatedAt: Date;
+  expiresAt: Date | null;
+  deviceOS: string;
+  deviceType: string;
+  pinExpiresAt: Date | null;
+};

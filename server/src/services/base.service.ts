@@ -13,6 +13,7 @@ import { LoggingRepository } from 'src/repositories/logging.repository';
 import { NotificationRepository } from 'src/repositories/notification.repository';
 import { ProcessRepository } from 'src/repositories/process.repository';
 import { ServerInfoRepository } from 'src/repositories/server-info.repository';
+import { SessionRepository } from 'src/repositories/session.repository';
 import { StorageRepository } from 'src/repositories/storage.repository';
 import { SystemMetadataRepository } from 'src/repositories/system-metadata.repository';
 import { TelemetryRepository } from 'src/repositories/telemetry.repository';
@@ -33,6 +34,7 @@ export class BaseService {
     protected notificationRepository: NotificationRepository,
     protected processRepository: ProcessRepository,
     protected serverInfoRepository: ServerInfoRepository,
+    protected sessionRepository: SessionRepository,
     protected storageRepository: StorageRepository,
     protected systemMetadataRepository: SystemMetadataRepository,
     protected telemetryRepository: TelemetryRepository,

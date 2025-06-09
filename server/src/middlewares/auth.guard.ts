@@ -12,6 +12,7 @@ import { Request } from 'express';
 import { AuthDto } from 'src/dtos/auth.dto';
 import { MetadataKey, Permission } from 'src/enum';
 import { LoggingRepository } from 'src/repositories/logging.repository';
+import { AuthService } from 'src/services/auth.service';
 
 type AdminRoute = { admin?: true };
 type SharedLinkRoute = { sharedLink?: true };
@@ -50,6 +51,7 @@ export class AuthGuard implements CanActivate {
   constructor(
     private logger: LoggingRepository,
     private reflector: Reflector,
+    private authService: AuthService,
   ) {
     this.logger.setContext(AuthGuard.name);
   }
@@ -62,6 +64,14 @@ export class AuthGuard implements CanActivate {
       return true;
     }
 
+    const { admin: adminRoute, permission } = { admin: false, ...options };
+    const request = context.switchToHttp().getRequest<AuthRequest>();
+
+    request.user = await this.authService.authenticate({
+      headers: request.headers,
+      queryParams: request.query as Record<string, string>,
+      metadata: { adminRoute, permission, uri: request.path },
+    });
     return true;
   }
 }

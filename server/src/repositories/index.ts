@@ -8,6 +8,7 @@ import { LoggingRepository } from 'src/repositories/logging.repository';
 import { NotificationRepository } from 'src/repositories/notification.repository';
 import { ProcessRepository } from 'src/repositories/process.repository';
 import { ServerInfoRepository } from 'src/repositories/server-info.repository';
+import { SessionRepository } from 'src/repositories/session.repository';
 import { StorageRepository } from 'src/repositories/storage.repository';
 import { SystemMetadataRepository } from 'src/repositories/system-metadata.repository';
 import { TelemetryRepository } from 'src/repositories/telemetry.repository';
@@ -23,6 +24,7 @@ export const repositories = [
   LoggingRepository,
   NotificationRepository,
   ProcessRepository,
+  SessionRepository,
   StorageRepository,
   ServerInfoRepository,
   SystemMetadataRepository,
