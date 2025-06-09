@@ -4,14 +4,37 @@
  */
 
 import type { ColumnType } from 'kysely';
-import { UserTable } from 'src/schemas/tables/user.table';
+import { UserTable } from './schemas/tables/user.table';
 
 export type Generated<T> =
   T extends ColumnType<infer S, infer I, infer U> ? ColumnType<S, I | undefined, U> : ColumnType<T, T | undefined, T>;
 
 export type Int8 = ColumnType<string, bigint | number | string, bigint | number | string>;
 
+export type Json = JsonValue;
+
+export type JsonArray = JsonValue[];
+
+export type JsonObject = {
+  [x: string]: JsonValue | undefined;
+};
+
+export type JsonPrimitive = boolean | number | string | null;
+
+export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
+
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
+
+export interface ApiKeys {
+  createdAt: Generated<Timestamp>;
+  id: Generated<string>;
+  key: string;
+  name: string;
+  permissions: string[];
+  updatedAt: Generated<Timestamp>;
+  updateId: Generated<string>;
+  userId: string;
+}
 
 export interface Migrations {
   id: Generated<number>;
@@ -19,21 +42,50 @@ export interface Migrations {
   timestamp: Int8;
 }
 
+export interface Sessions {
+  createdAt: Generated<Timestamp>;
+  deviceOS: Generated<string>;
+  deviceType: Generated<string>;
+  expiresAt: Timestamp | null;
+  id: Generated<string>;
+  parentId: string | null;
+  pinExpiresAt: Timestamp | null;
+  token: string;
+  updatedAt: Generated<Timestamp>;
+  updateId: Generated<string>;
+  userId: string;
+}
+
+export interface SystemMetadata {
+  key: string;
+  value: Json;
+}
+
 export interface Users {
   createdAt: Generated<Timestamp>;
   deletedAt: Timestamp | null;
   email: string;
-  firstName: Generated<string | null>;
   id: Generated<string>;
   isAdmin: Generated<boolean | null>;
   isFirstLoggedIn: Generated<boolean | null>;
-  lastName: Generated<string | null>;
+  name: Generated<string | null>;
   password: string;
-  salt: string;
   shouldChangePassword: Generated<boolean | null>;
+  status: Generated<string>;
+  updatedAt: Timestamp | null;
+}
+
+export interface VersionHistory {
+  createdAt: Generated<Timestamp>;
+  id: Generated<string>;
+  version: string;
 }
 
 export interface DB {
+  api_keys: ApiKeys;
   migrations: Migrations;
+  sessions: Sessions;
+  system_metadata: SystemMetadata;
   users: UserTable;
+  version_history: VersionHistory;
 }

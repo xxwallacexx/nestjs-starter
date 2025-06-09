@@ -35,6 +35,14 @@ export enum Permission {
   ADMIN_USER_READ = 'admin.user.read',
   ADMIN_USER_UPDATE = 'admin.user.update',
   ADMIN_USER_DELETE = 'admin.user.delete',
+
+  AUTH_DEVICE_DELETE = 'authDevice.delete',
+
+  SESSION_CREATE = 'session.create',
+  SESSION_READ = 'session.read',
+  SESSION_UPDATE = 'session.update',
+  SESSION_DELETE = 'session.delete',
+  SESSION_LOCK = 'session.lock',
 }
 
 export enum UserStatus {
@@ -111,6 +119,7 @@ export enum JobName {
   //backups
   BACKUP_DATABASE = 'database-backup',
 
+  CLEAN_OLD_SESSION_TOKENS = 'clean-old-session-tokens',
   // Notification
   // NOTIFY_SIGNUP = 'notify-signup',
   // SEND_EMAIL = 'notification-send-email',
