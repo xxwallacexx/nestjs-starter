@@ -12,7 +12,7 @@ import { ConfigRepository } from 'src/repositories/config.repository';
 import { LoggingRepository } from 'src/repositories/logging.repository';
 import { bootstrapTelemetry } from 'src/repositories/telemetry.repository';
 import { ApiService } from 'src/services/api.service';
-import { isStartUpError, useSwagger } from 'src/utils/misc';
+import { isStartUpError } from 'src/utils/misc';
 
 async function bootstrap() {
   process.title = 'api';
@@ -43,8 +43,6 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api', { exclude: excludePaths });
   if (existsSync(resourcePaths.web.root)) {
-    //   // copied from https://github.com/sveltejs/kit/blob/679b5989fe62e3964b9a73b712d7b41831aa1f07/packages/adapter-node/src/handler.js#L46
-    //   // provides serving of precompressed assets and caching of immutable assets
     app.use(
       sirv(resourcePaths.web.root, {
         etag: true,

@@ -35,7 +35,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_DB: ${DB_DATABASE_NAME}
-      POSTGRES_INITDB_ARGS: '--data-checksums'
+      POSTGRES_INITDB_ARGS: "--data-checksums"
     volumes:
       - ${UPLOAD_LOCATION}/postgres:/var/lib/postgresql/data
     ports:
@@ -50,8 +50,7 @@ services:
       postgres -c logging_collector=on -c max_wal_size=2GB -c shared_buffers=512MB -c wal_compression=on
     restart: always
 
-  # set IMMICH_TELEMETRY_INCLUDE=all in .env to enable metrics
-  immich-prometheus:
+  prometheus:
     container_name: fat_prometheus
     ports:
       - 9090:9090
@@ -60,9 +59,9 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus-data:/prometheus
 
-  immich-grafana:
+  grafana:
     container_name: fat_grafana
-    command: [ './run.sh', '-disable-reporting' ]
+    command: ["./run.sh", "-disable-reporting"]
     ports:
       - 3000:3000
     image: grafana/grafana:11.6.0-ubuntu@sha256:fd8fa48213c624e1a95122f1d93abbf1cf1cbe85fc73212c1e599dbd76c63ff8

@@ -37,20 +37,6 @@ export class ServerInfoRepository {
     this.logger.setContext(ServerInfoRepository.name);
   }
 
-  async getGitHubRelease(): Promise<GitHubRelease> {
-    try {
-      const response = await fetch('https://api.github.com/repos/immich-app/immich/releases/latest');
-
-      if (!response.ok) {
-        throw new Error(`GitHub API request failed with status ${response.status}: ${await response.text()}`);
-      }
-
-      return response.json();
-    } catch (error) {
-      throw new Error(`Failed to fetch GitHub release: ${error}`);
-    }
-  }
-
   async getBuildVersions(): Promise<ServerBuildVersions> {
     const { nodeVersion } = this.configRepository.getEnv();
 
