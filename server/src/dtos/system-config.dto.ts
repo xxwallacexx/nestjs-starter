@@ -21,7 +21,6 @@ import { ConcurrentQueueName } from 'src/types';
 import { IsCronExpression, ValidateBoolean } from 'src/validation';
 
 const isLibraryScanEnabled = (config: SystemConfigLibraryScanDto) => config.enabled;
-const isEmailNotificationEnabled = (config: SystemConfigSmtpDto) => config.enabled;
 const isDatabaseBackupEnabled = (config: DatabaseBackupConfig) => config.enabled;
 
 export class DatabaseBackupConfig {
@@ -72,12 +71,6 @@ class SystemConfigJobDto implements Record<ConcurrentQueueName, JobSettingsDto> 
   @IsObject()
   @Type(() => JobSettingsDto)
   [QueueName.SEARCH]!: JobSettingsDto;
-
-  @ApiProperty({ type: JobSettingsDto })
-  @ValidateNested()
-  @IsObject()
-  @Type(() => JobSettingsDto)
-  [QueueName.NOTIFICATION]!: JobSettingsDto;
 }
 
 class SystemConfigLibraryScanDto {
@@ -146,33 +139,6 @@ class SystemConfigSmtpTransportDto {
   password!: string;
 }
 
-export class SystemConfigSmtpDto {
-  @IsBoolean()
-  enabled!: boolean;
-
-  @ValidateIf(isEmailNotificationEnabled)
-  @IsNotEmpty()
-  @IsString()
-  @IsNotEmpty()
-  from!: string;
-
-  @IsString()
-  replyTo!: string;
-
-  @ValidateIf(isEmailNotificationEnabled)
-  @Type(() => SystemConfigSmtpTransportDto)
-  @ValidateNested()
-  @IsObject()
-  transport!: SystemConfigSmtpTransportDto;
-}
-
-class SystemConfigNotificationsDto {
-  @Type(() => SystemConfigSmtpDto)
-  @ValidateNested()
-  @IsObject()
-  smtp!: SystemConfigSmtpDto;
-}
-
 class SystemConfigUserDto {
   @IsInt()
   @Min(1)
@@ -206,11 +172,6 @@ export class SystemConfigDto implements SystemConfig {
   @ValidateNested()
   @IsObject()
   job!: SystemConfigJobDto;
-
-  @Type(() => SystemConfigNotificationsDto)
-  @ValidateNested()
-  @IsObject()
-  notifications!: SystemConfigNotificationsDto;
 
   @Type(() => SystemConfigServerDto)
   @ValidateNested()

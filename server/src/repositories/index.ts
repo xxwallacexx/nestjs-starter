@@ -5,8 +5,6 @@ import { DatabaseRepository } from 'src/repositories/database.repository';
 import { EventRepository } from 'src/repositories/event.repository';
 import { JobRepository } from 'src/repositories/job.repository';
 import { LoggingRepository } from 'src/repositories/logging.repository';
-import { NotificationRepository } from 'src/repositories/notification.repository';
-import { ProcessRepository } from 'src/repositories/process.repository';
 import { ServerInfoRepository } from 'src/repositories/server-info.repository';
 import { SessionRepository } from 'src/repositories/session.repository';
 import { StorageRepository } from 'src/repositories/storage.repository';
@@ -22,8 +20,6 @@ export const repositories = [
   EventRepository,
   JobRepository,
   LoggingRepository,
-  NotificationRepository,
-  ProcessRepository,
   SessionRepository,
   StorageRepository,
   ServerInfoRepository,

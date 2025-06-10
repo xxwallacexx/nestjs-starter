@@ -1,17 +1,17 @@
+import { UpdatedAtTrigger, UpdateIdColumn } from 'src/decorators';
 import { Permission } from 'src/enum';
 import { UserTable } from 'src/schemas/tables/user.table';
 import {
   Column,
-  ColumnIndex,
   CreateDateColumn,
   ForeignKeyColumn,
   PrimaryGeneratedColumn,
   Table,
   UpdateDateColumn,
-  UpdateIdColumn,
 } from 'src/sql-tools';
 
 @Table('api_keys')
+@UpdatedAtTrigger('api_keys_updated_at')
 export class APIKeyTable {
   @PrimaryGeneratedColumn()
   id!: string;
@@ -31,8 +31,7 @@ export class APIKeyTable {
   @UpdateDateColumn()
   updatedAt!: Date;
 
-  @ColumnIndex({ name: 'IDX_api_keys_update_id' })
-  @UpdateIdColumn()
+  @UpdateIdColumn({ indexName: 'IDX_api_keys_update_id' })
   updateId?: string;
 
   @ForeignKeyColumn(() => UserTable, { onUpdate: 'CASCADE', onDelete: 'CASCADE' })

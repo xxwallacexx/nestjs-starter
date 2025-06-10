@@ -1,5 +1,5 @@
 import { SystemConfig } from 'src/config';
-import { JobName, QueueName, SystemMetadataKey } from 'src/enum';
+import { DatabaseSslMode, JobName, QueueName, SystemMetadataKey } from 'src/enum';
 
 export type DeepPartial<T> = T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;
 
@@ -23,8 +23,9 @@ export interface CropOptions {
 
 export type ConcurrentQueueName = Exclude<QueueName, QueueName.BACKUP_DATABASE>;
 
-export type Jobs = { [K in JobItem['name']]: (JobItem & { name: K })['data'] };
-export type JobOf<T extends keyof Jobs> = Jobs[T];
+export type ValidJobNames = JobItem['name'];
+export type Jobs = { [K in ValidJobNames]: (JobItem & { name: K })['data'] };
+export type JobOf<T extends ValidJobNames> = Jobs[T];
 
 export interface IBaseJob {
   force?: boolean;
@@ -68,10 +69,6 @@ export interface QueueStatus {
   isPaused: boolean;
 }
 
-export type JobItem =
-  // Backups
-  { name: JobName.BACKUP_DATABASE; data?: IBaseJob };
-
 export type DatabaseConnectionURL = {
   connectionType: 'url';
   url: string;
@@ -84,6 +81,7 @@ export type DatabaseConnectionParts = {
   username: string;
   password: string;
   database: string;
+  ssl?: DatabaseSslMode;
 };
 
 export type DatabaseConnectionParams = DatabaseConnectionURL | DatabaseConnectionParts;
@@ -92,6 +90,8 @@ export interface ExtensionVersion {
   availableVersion: string | null;
   installedVersion: string | null;
 }
+
+export type JobItem = { name: JobName.CLEAN_OLD_SESSION_TOKENS; data?: IBaseJob };
 
 export type VersionCheckMetadata = {
   checkedAt: string;

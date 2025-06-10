@@ -162,11 +162,3 @@ export class ServerFeaturesDto {
   search!: boolean;
   email!: boolean;
 }
-
-export interface ReleaseNotification {
-  isAvailable: boolean;
-  /** ISO8601 */
-  checkedAt: string;
-  serverVersion: ServerVersionResponseDto;
-  releaseVersion: ServerVersionResponseDto;
-}

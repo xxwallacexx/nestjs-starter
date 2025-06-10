@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { Insertable } from 'kysely';
 import { SystemConfig } from 'src/config';
 import { SALT_ROUNDS } from 'src/constants';
-import { UserEntity } from 'src/entities/user.entity';
+import { UserAdmin } from 'src/database';
 import { ConfigRepository } from 'src/repositories/config.repository';
 import { CronRepository } from 'src/repositories/cron.repository';
 import { CryptoRepository } from 'src/repositories/crypto.repository';
@@ -10,8 +10,6 @@ import { DatabaseRepository } from 'src/repositories/database.repository';
 import { EventRepository } from 'src/repositories/event.repository';
 import { JobRepository } from 'src/repositories/job.repository';
 import { LoggingRepository } from 'src/repositories/logging.repository';
-import { NotificationRepository } from 'src/repositories/notification.repository';
-import { ProcessRepository } from 'src/repositories/process.repository';
 import { ServerInfoRepository } from 'src/repositories/server-info.repository';
 import { SessionRepository } from 'src/repositories/session.repository';
 import { StorageRepository } from 'src/repositories/storage.repository';
@@ -31,8 +29,6 @@ export class BaseService {
     protected databaseRepository: DatabaseRepository,
     protected eventRepository: EventRepository,
     protected jobRepository: JobRepository,
-    protected notificationRepository: NotificationRepository,
-    protected processRepository: ProcessRepository,
     protected serverInfoRepository: ServerInfoRepository,
     protected sessionRepository: SessionRepository,
     protected storageRepository: StorageRepository,
@@ -63,7 +59,7 @@ export class BaseService {
     return updateConfig(this.configRepos, newConfig);
   }
 
-  async createUser(dto: Insertable<UserTable> & { email: string }): Promise<UserEntity> {
+  async createUser(dto: Insertable<UserTable> & { email: string }): Promise<UserAdmin> {
     const user = await this.userRepository.getByEmail(dto.email);
     if (user) {
       throw new BadRequestException('User exists');

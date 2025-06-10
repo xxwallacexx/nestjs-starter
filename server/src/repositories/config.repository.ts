@@ -16,7 +16,6 @@ import { EnvDto } from 'src/dtos/env.dto';
 import { AppEnvironment, AppHeader, AppTelemetry, AppWorker, LogLevel, QueueName } from 'src/enum';
 import { DatabaseConnectionParams } from 'src/types';
 import { setDifference } from 'src/utils/set';
-import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions.js';
 
 type Ssl = 'require' | 'allow' | 'prefer' | 'verify-full' | boolean | object;
 type PostgresConnectionConfig = {
@@ -65,10 +64,7 @@ export interface EnvData {
   };
 
   database: {
-    config: {
-      typeorm: PostgresConnectionOptions & DatabaseConnectionParams;
-      kysely: PostgresConnectionConfig;
-    };
+    config: DatabaseConnectionParams;
     skipMigrations: boolean;
   };
 
@@ -194,6 +190,18 @@ const getEnv = (): EnvData => {
     }
   }
 
+  const databaseConnection: DatabaseConnectionParams = dto.DB_URL
+    ? { connectionType: 'url', url: dto.DB_URL }
+    : {
+        connectionType: 'parts',
+        host: dto.DB_HOSTNAME || 'database',
+        port: dto.DB_PORT || 5432,
+        username: dto.DB_USERNAME || 'postgres',
+        password: dto.DB_PASSWORD || 'postgres',
+        database: dto.DB_DATABASE_NAME || 'fat',
+        ssl: dto.DB_SSL_MODE || undefined,
+      };
+
   const parts = {
     connectionType: 'parts',
     host: dto.DB_HOSTNAME || 'database',
@@ -299,21 +307,8 @@ const getEnv = (): EnvData => {
     },
 
     database: {
-      config: {
-        typeorm: {
-          type: 'postgres',
-          entities: [],
-          migrations: [`${folders.dist}/migrations` + '/*.{js,ts}'],
-          subscribers: [],
-          migrationsRun: false,
-          synchronize: false,
-          connectTimeoutMS: 10_000, // 10 seconds
-          parseInt8: true,
-          ...(databaseUrl ? { connectionType: 'url', url: databaseUrl } : parts),
-        },
-        kysely: driverOptions,
-      },
-      skipMigrations: false,
+      config: databaseConnection,
+      skipMigrations: dto.DB_SKIP_MIGRATIONS ?? false,
     },
 
     licensePublicKey: isProd ? productionKeys : stagingKeys,

@@ -22,20 +22,6 @@ export interface SystemConfig {
   newVersionCheck: {
     enabled: boolean;
   };
-  notifications: {
-    smtp: {
-      enabled: boolean;
-      from: string;
-      replyTo: string;
-      transport: {
-        ignoreCert: boolean;
-        host: string;
-        port: number;
-        username: string;
-        password: string;
-      };
-    };
-  };
 
   server: {
     externalDomain: string;
@@ -59,7 +45,6 @@ export const defaults = Object.freeze<SystemConfig>({
     [QueueName.BACKGROUND_TASK]: { concurrency: 5 },
     [QueueName.SEARCH]: { concurrency: 5 },
     [QueueName.MIGRATION]: { concurrency: 5 },
-    [QueueName.NOTIFICATION]: { concurrency: 5 },
   },
   logging: {
     enabled: true,
@@ -75,20 +60,6 @@ export const defaults = Object.freeze<SystemConfig>({
     externalDomain: '',
     loginPageMessage: '',
     publicUsers: true,
-  },
-  notifications: {
-    smtp: {
-      enabled: false,
-      from: '',
-      replyTo: '',
-      transport: {
-        ignoreCert: false,
-        host: '',
-        port: 587,
-        username: '',
-        password: '',
-      },
-    },
   },
   user: {
     deleteDelay: 7,
