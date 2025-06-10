@@ -4,7 +4,24 @@ import _ from 'lodash';
 import { ADDED_IN_PREFIX, DEPRECATED_IN_PREFIX, LIFECYCLE_EXTENSION } from 'src/constants';
 import { AppWorker, JobName, MetadataKey, QueueName } from 'src/enum';
 import { EmitEvent } from 'src/repositories/event.repository';
+import { updated_at, uuid_v7 } from 'src/schemas/functions';
+import { BeforeUpdateTrigger, Column, ColumnOptions } from 'src/sql-tools';
 import { setUnion } from 'src/utils/set';
+
+const GeneratedUuidV7Column = (options: Omit<ColumnOptions, 'type' | 'default' | 'nullable'> = {}) =>
+  Column({ ...options, type: 'uuid', nullable: false, default: () => `${uuid_v7.name}()` });
+
+export const UpdateIdColumn = (options: Omit<ColumnOptions, 'type' | 'default' | 'nullable'> = {}) =>
+  GeneratedUuidV7Column(options);
+
+export const PrimaryGeneratedUuidV7Column = () => GeneratedUuidV7Column({ primary: true });
+
+export const UpdatedAtTrigger = (name: string) =>
+  BeforeUpdateTrigger({
+    name,
+    scope: 'row',
+    function: updated_at,
+  });
 
 // PostgreSQL uses a 16-bit integer to indicate the number of bound parameters. This means that the
 // maximum number of parameters is 65535. Any query that tries to bind more than that (e.g. searching
@@ -48,11 +65,7 @@ function chunks<T>(collection: Array<T> | Set<T>, size: number): Array<Array<T>>
  * @param options.flatten Whether to flatten the results. Defaults to false.
  */
 export function Chunked(
-  options: {
-    paramIndex?: number;
-    chunkSize?: number;
-    mergeFn?: (results: any) => any;
-  } = {},
+  options: { paramIndex?: number; chunkSize?: number; mergeFn?: (results: any) => any } = {},
 ): MethodDecorator {
   return (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) => {
     const originalMethod = descriptor.value;
@@ -96,14 +109,14 @@ export const DummyValue = {
   UUID,
   UUID_SET: new Set([UUID]),
   PAGINATION: { take: 10, skip: 0 },
-  EMAIL: 'user@fetchapptech.com',
+  EMAIL: 'user@gmail.com',
   STRING: 'abcdefghi',
   NUMBER: 50,
   BUFFER: Buffer.from('abcdefghi'),
   DATE: new Date(),
   TIME_BUCKET: '2024-01-01T00:00:00.000Z',
   BOOLEAN: true,
-  VECTOR: '[1, 2, 3]',
+  VECTOR: JSON.stringify(Array.from({ length: 512 }, () => 0)),
 };
 
 export const GENERATE_SQL_KEY = 'generate-sql-key';
@@ -111,6 +124,7 @@ export const GENERATE_SQL_KEY = 'generate-sql-key';
 export interface GenerateSqlQueries {
   name?: string;
   params: unknown[];
+  stream?: boolean;
 }
 
 export const Telemetry = (options: { enabled?: boolean }) =>
@@ -147,10 +161,7 @@ export const EndpointLifecycle = ({ addedAt, deprecatedAt }: LifecycleMetadata) 
   if (deprecatedAt) {
     decorators.push(
       ApiTags('Deprecated'),
-      ApiOperation({
-        deprecated: true,
-        description: DEPRECATED_IN_PREFIX + deprecatedAt,
-      }),
+      ApiOperation({ deprecated: true, description: DEPRECATED_IN_PREFIX + deprecatedAt }),
     );
   }
 
@@ -161,12 +172,7 @@ export const PropertyLifecycle = ({ addedAt, deprecatedAt }: LifecycleMetadata) 
   const decorators: PropertyDecorator[] = [];
   decorators.push(ApiProperty({ description: ADDED_IN_PREFIX + addedAt }));
   if (deprecatedAt) {
-    decorators.push(
-      ApiProperty({
-        deprecated: true,
-        description: DEPRECATED_IN_PREFIX + deprecatedAt,
-      }),
-    );
+    decorators.push(ApiProperty({ deprecated: true, description: DEPRECATED_IN_PREFIX + deprecatedAt }));
   }
 
   return applyDecorators(...decorators);

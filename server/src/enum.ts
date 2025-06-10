@@ -111,19 +111,11 @@ export enum QueueName {
   BACKGROUND_TASK = 'backgroundTask',
   MIGRATION = 'migration',
   SEARCH = 'search',
-  NOTIFICATION = 'notifications',
   BACKUP_DATABASE = 'backupDatabase',
 }
 
 export enum JobName {
-  //backups
-  BACKUP_DATABASE = 'database-backup',
-
   CLEAN_OLD_SESSION_TOKENS = 'clean-old-session-tokens',
-  // Notification
-  // NOTIFY_SIGNUP = 'notify-signup',
-  // SEND_EMAIL = 'notification-send-email',
-
   // Version check
   // VERSION_CHECK = 'version-check',
 }
@@ -187,4 +179,12 @@ export enum ManualJobName {
   MEMORY_CLEANUP = 'memory-cleanup',
   MEMORY_CREATE = 'memory-create',
   BACKUP_DATABASE = 'backup-database',
+}
+
+export enum DatabaseSslMode {
+  Disable = 'disable',
+  Allow = 'allow',
+  Prefer = 'prefer',
+  Require = 'require',
+  VerifyFull = 'verify-full',
 }

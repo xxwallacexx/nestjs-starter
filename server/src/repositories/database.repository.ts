@@ -1,10 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import AsyncLock from 'async-lock';
-import { FileMigrationProvider, Kysely, Migrator, sql, Transaction } from 'kysely';
+import { FileMigrationProvider, Kysely, Migrator, sql } from 'kysely';
 import { InjectKysely } from 'nestjs-kysely';
-import { existsSync } from 'node:fs';
 import { readdir } from 'node:fs/promises';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { POSTGRES_VERSION_RANGE } from 'src/constants';
 import { DB } from 'src/db';
 import { GenerateSql } from 'src/decorators';
@@ -41,27 +40,40 @@ export class DatabaseRepository {
 
   async runMigrations(options?: { transaction?: 'all' | 'none' | 'each' }): Promise<void> {
     const { database } = this.configRepository.getEnv();
-    const dataSource = new DataSource(database.config.typeorm);
-
-    this.logger.log(database.config.typeorm.host ?? '');
 
     this.logger.log('Running migrations, this may take a while');
 
-    this.logger.debug('Running typeorm migrations');
+    const tableExists = sql<{ result: string | null }>`select to_regclass('migrations') as "result"`;
+    const { rows } = await tableExists.execute(this.db);
+    const hasTypeOrmMigrations = !!rows[0]?.result;
+    if (hasTypeOrmMigrations) {
+      // eslint-disable-next-line unicorn/prefer-module
+      const dist = resolve(`${__dirname}/..`);
 
-    await dataSource.initialize();
-
-    await dataSource.runMigrations(options);
-    await dataSource.destroy();
-
-    this.logger.debug('Finished running typeorm migrations');
-
-    // eslint-disable-next-line unicorn/prefer-module
-    const migrationFolder = join(__dirname, '..', 'schemas/migrations');
-
-    // TODO remove after we have at least one kysely migration
-    if (!existsSync(migrationFolder)) {
-      return;
+      this.logger.debug('Running typeorm migrations');
+      const dataSource = new DataSource({
+        type: 'postgres',
+        entities: [],
+        subscribers: [],
+        migrations: [`${dist}/migrations` + '/*.{js,ts}'],
+        migrationsRun: false,
+        synchronize: false,
+        connectTimeoutMS: 10_000, // 10 seconds
+        parseInt8: true,
+        ...(database.config.connectionType === 'url'
+          ? { url: database.config.url }
+          : {
+              host: database.config.host,
+              port: database.config.port,
+              username: database.config.username,
+              password: database.config.password,
+              database: database.config.database,
+            }),
+      });
+      await dataSource.initialize();
+      await dataSource.runMigrations(options);
+      await dataSource.destroy();
+      this.logger.debug('Finished running typeorm migrations');
     }
 
     this.logger.debug('Running kysely migrations');
@@ -72,7 +84,8 @@ export class DatabaseRepository {
       provider: new FileMigrationProvider({
         fs: { readdir },
         path: { join },
-        migrationFolder,
+        // eslint-disable-next-line unicorn/prefer-module
+        migrationFolder: join(__dirname, '..', 'schemas/migrations'),
       }),
     });
 

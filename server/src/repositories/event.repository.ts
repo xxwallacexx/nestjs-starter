@@ -13,7 +13,7 @@ import { Server, Socket } from 'socket.io';
 import { SystemConfig } from 'src/config';
 import { EventConfig } from 'src/decorators';
 import { AuthDto } from 'src/dtos/auth.dto';
-import { ReleaseNotification, ServerVersionResponseDto } from 'src/dtos/server.dto';
+import { ServerVersionResponseDto } from 'src/dtos/server.dto';
 import { AppWorker, MetadataKey, QueueName } from 'src/enum';
 import { ConfigRepository } from 'src/repositories/config.repository';
 import { LoggingRepository } from 'src/repositories/logging.repository';
@@ -50,14 +50,6 @@ type EventMap = {
   // session events
   'session.delete': [{ sessionId: string }];
 
-  // stack events
-  'stack.create': [{ stackId: string; userId: string }];
-  'stack.update': [{ stackId: string; userId: string }];
-  'stack.delete': [{ stackId: string; userId: string }];
-
-  // stack bulk events
-  'stacks.delete': [{ stackIds: string[]; userId: string }];
-
   // user events
   'user.signup': [{ notify: boolean; id: string; tempPassword?: string }];
 
@@ -77,7 +69,6 @@ export interface ClientEventMap {
   on_user_delete: [string];
   on_server_version: [ServerVersionResponseDto];
   on_config_update: [];
-  on_new_release: [ReleaseNotification];
   on_session_delete: [string];
 }
 

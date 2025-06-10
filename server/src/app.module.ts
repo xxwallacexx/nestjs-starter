@@ -2,11 +2,9 @@ import { BullModule } from '@nestjs/bullmq';
 import { Inject, Module, OnModuleDestroy, OnModuleInit, ValidationPipe } from '@nestjs/common';
 import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ScheduleModule, SchedulerRegistry } from '@nestjs/schedule';
-import { PostgresJSDialect } from 'kysely-postgres-js';
 import { ClsModule } from 'nestjs-cls';
 import { KyselyModule } from 'nestjs-kysely';
 import { OpenTelemetryModule } from 'nestjs-otel';
-import postgres from 'postgres';
 import { IWorker } from 'src/constants';
 import { controllers } from 'src/controllers';
 import { AppWorker } from 'src/enum';
@@ -22,6 +20,7 @@ import { LoggingRepository } from 'src/repositories/logging.repository';
 import { teardownTelemetry, TelemetryRepository } from 'src/repositories/telemetry.repository';
 import { services } from 'src/services';
 import { CliService } from 'src/services/cli.service';
+import { getKyselyConfig } from './utils/database';
 
 const common = [...repositories, ...services, GlobalExceptionFilter];
 
@@ -41,19 +40,7 @@ const imports = [
   BullModule.registerQueue(...bull.queues),
   ClsModule.forRoot(cls.config),
   OpenTelemetryModule.forRoot(otel),
-  KyselyModule.forRoot({
-    dialect: new PostgresJSDialect({ postgres: postgres(database.config.kysely) }),
-    log(event) {
-      if (event.level === 'error') {
-        console.error('Query failed :', {
-          durationMs: event.queryDurationMillis,
-          error: event.error,
-          sql: event.query.sql,
-          params: event.query.parameters,
-        });
-      }
-    },
-  }),
+  KyselyModule.forRoot(getKyselyConfig(database.config)),
 ];
 
 class BaseModule implements OnModuleInit, OnModuleDestroy {
@@ -70,7 +57,7 @@ class BaseModule implements OnModuleInit, OnModuleDestroy {
   async onModuleInit() {
     this.telemetryRepository.setup({ repositories });
 
-    this.jobRepository.setup({ services });
+    this.jobRepository.setup(services);
     if (this.worker === AppWorker.MICROSERVICES) {
       this.jobRepository.startWorkers();
     }

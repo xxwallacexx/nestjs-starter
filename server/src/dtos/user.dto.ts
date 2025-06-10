@@ -91,7 +91,7 @@ export class UserAdminResponseDto extends UserResponseDto {
   status!: string;
 }
 
-export const mapUser = (entity: UserEntity | User): UserResponseDto => {
+export const mapUser = (entity: User | UserAdmin): UserResponseDto => {
   return {
     id: entity.id,
     email: entity.email,
@@ -99,7 +99,7 @@ export const mapUser = (entity: UserEntity | User): UserResponseDto => {
   };
 };
 
-export function mapUserAdmin(entity: UserEntity | UserAdmin): UserAdminResponseDto {
+export function mapUserAdmin(entity: UserAdmin): UserAdminResponseDto {
   return {
     ...mapUser(entity),
     shouldChangePassword: entity.shouldChangePassword,

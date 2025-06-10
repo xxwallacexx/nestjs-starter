@@ -1,15 +1,14 @@
 import { ColumnType } from 'kysely';
+import { UpdatedAtTrigger, UpdateIdColumn } from 'src/decorators';
 import { UserStatus } from 'src/enum';
 import {
   Column,
-  ColumnIndex,
   CreateDateColumn,
   DeleteDateColumn,
   Index,
   PrimaryGeneratedColumn,
   Table,
   UpdateDateColumn,
-  UpdateIdColumn,
 } from 'src/sql-tools';
 
 type Timestamp = ColumnType<Date, Date | string, Date | string>;
@@ -17,6 +16,7 @@ type Generated<T> =
   T extends ColumnType<infer S, infer I, infer U> ? ColumnType<S, I | undefined, U> : ColumnType<T, T | undefined, T>;
 
 @Table('users')
+@UpdatedAtTrigger('users_updated_at')
 @Index({
   name: 'IDX_users_updated_at_asc_id_asc',
   columns: ['updatedAt', 'id'],
@@ -52,7 +52,6 @@ export class UserTable {
   @Column({ type: 'character varying', default: UserStatus.ACTIVE })
   status!: Generated<UserStatus>;
 
-  @ColumnIndex({ name: 'IDX_users_update_id' })
   @UpdateIdColumn()
   updateId!: Generated<string>;
 }
